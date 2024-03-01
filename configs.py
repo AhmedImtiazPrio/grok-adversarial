@@ -14,7 +14,8 @@ def config_resnet18_cifar10():
     config.num_steps = 100000                       # number of training steps
     config.weight_decay = 0.
     config.label_smoothing = 0.
-    config.log_steps = np.unique(np.logspace(0,6,100).astype(int))
+    config.log_steps = np.unique(
+        np.logspace(0,6,100).astype(int))          # which steps to log stats for
     config.seed = 42
     config.normalize = True                        # rescale cifar10 to have mean 0 std 1.25
     config.save_model = False                      # save every model checkpoint
