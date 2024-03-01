@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import warnings
-
+import time
 
 @torch.no_grad()
 @torch.jit.script
@@ -131,7 +131,8 @@ def get_intersections_for_hulls(hulls,
                                 model,
                                 layer_names,
                                 activation_buffer,
-                                batch_size=32
+                                batch_size=32,
+                                verbose=False
                                 ):
 
     """
@@ -156,7 +157,8 @@ def get_intersections_for_hulls(hulls,
     p_inters = torch.zeros_like(n_inters)
 
     start = 0
-    for batch in tqdm(dataloader,desc='Calculating Intersections'):
+    start_time = time.now()
+    for batch in dataloader:
 
         end  = start+batch_size
 
@@ -171,5 +173,8 @@ def get_intersections_for_hulls(hulls,
         p_inters[start:end] = p_inter.cpu()
 
         start = end
-
+    
+    if verbose:
+        print(f"LC elapsed time:{time.time()-start_time:.5f}")
+    
     return n_inters, p_inters
