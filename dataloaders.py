@@ -126,7 +126,7 @@ def cifar10_dataloaders_ffcv(config,
             Convert(torch.float16) if precision == 'fp16' else Convert(torch.float32),
             torchvision.transforms.Normalize(CIFAR_MEAN, CIFAR_STD),
         ])
-
+        
         ordering = OrderOption.RANDOM # if name == 'train' else OrderOption.SEQUENTIAL
 
         loaders[name] = Loader(paths[name],
