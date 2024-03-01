@@ -157,7 +157,7 @@ def get_intersections_for_hulls(hulls,
     p_inters = torch.zeros_like(n_inters)
 
     start = 0
-    start_time = time.now()
+    start_time = time.time()
     for batch in dataloader:
 
         end  = start+batch_size
