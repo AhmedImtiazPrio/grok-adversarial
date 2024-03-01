@@ -1,9 +1,11 @@
 import torch
 import torchvision
 from torchvision import transforms
+from typing import List
 
 import os
 import time
+import warnings
 
 def cifar10_dataloaders(config):
     """
@@ -37,7 +39,7 @@ def cifar10_dataloaders(config):
     test = torchvision.datasets.CIFAR10(root='./data', train=False,
       transform=val_transform, download=True)
     test_loader = torch.utils.data.DataLoader(test,
-                                            batch_size=config.eval_batch_size,
+                                            batch_size=config.test_batch_size,
                                             shuffle=True) ## shuffling
                                                           ## to get random
                                                           ## neighborhood for LC
@@ -49,7 +51,8 @@ def cifar10_dataloaders_ffcv(config,
                              train_path='./data/cifar10_train.beton',
                              test_path='./data/cifar10_test.beton',
                              precision='fp32',
-                             os_cache=True
+                             os_cache=True,
+                             num_workers=2
                             ):
     """
     Create ffcv dataloaders if ffcv is available
@@ -74,16 +77,17 @@ def cifar10_dataloaders_ffcv(config,
     
     paths = {
         'train': train_path,
-        'test': test_path'
-
+        'test': test_path
     }
     
     ### create ffcv datasets if not exists
     if not os.path.exists(train_path):
+
+        print(f'{train_path} not found. Creating FFCV dataset...')
     
         datasets = {
-                'train': torchvision.datasets.cifar10('./data', train=True, download=True),
-                'test': torchvision.datasets.cifar10('./data', train=False, download=True)
+                'train': torchvision.datasets.CIFAR10('./data', train=True, download=True),
+                'test': torchvision.datasets.CIFAR10('./data', train=False, download=True)
                 }
         
         for (name, ds) in datasets.items():
@@ -101,7 +105,8 @@ def cifar10_dataloaders_ffcv(config,
     loaders = {}
 
     for name in ['train', 'test']:
-        label_pipeline: List[Operation] = [IntDecoder(), ToTensor(), ToDevice(ch.device('cuda:0')), Squeeze()]
+        label_pipeline: List[Operation] = [IntDecoder(), ToTensor(),
+         ToDevice(torch.device('cuda:0')), Squeeze()]
         image_pipeline: List[Operation] = [SimpleRGBImageDecoder()]
 
         ### add augmentations for train
@@ -116,15 +121,17 @@ def cifar10_dataloaders_ffcv(config,
 
         image_pipeline.extend([
             ToTensor(),
-            ToDevice(ch.device('cuda:0'), non_blocking=True),
+            ToDevice(torch.device('cuda:0'), non_blocking=True),
             ToTorchImage(),
-            Convert(ch.float16) if precision == 'fp16' else Convert(ch.float32),
+            Convert(torch.float16) if precision == 'fp16' else Convert(torch.float32),
             torchvision.transforms.Normalize(CIFAR_MEAN, CIFAR_STD),
         ])
 
-        ordering = OrderOption.RANDOM if name == 'train' else OrderOption.SEQUENTIAL
+        ordering = OrderOption.RANDOM # if name == 'train' else OrderOption.SEQUENTIAL
 
-        loaders[name] = Loader(paths[name], batch_size=batch_size, num_workers=num_workers,
+        loaders[name] = Loader(paths[name],
+                               batch_size=getattr(config,f'{name}_batch_size'),
+                               num_workers=num_workers,
                                order=ordering, drop_last=(name == 'train'), os_cache=os_cache,
                                pipelines={'image': image_pipeline, 'label': label_pipeline})
     

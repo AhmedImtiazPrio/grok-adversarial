@@ -10,7 +10,7 @@ def config_resnet18_cifar10():
     config.lr_schedule_flag = False
 
     config.train_batch_size = 256
-    config.eval_batch_size = 2048
+    config.test_batch_size = 2048
     config.num_steps = 100000                       # number of training steps
     config.weight_decay = 0.
     config.label_smoothing = 0.
@@ -20,7 +20,8 @@ def config_resnet18_cifar10():
     config.normalize = True                        # rescale cifar10 to have mean 0 std 1.25
     config.save_model = False                      # save every model checkpoint
     config.wandb_log = True                        # log using wandb
-
+    config.use_ffcv = True
+    
     ## resnet params
     config.k = 16                                  # Resnet width parameter, number of filters in first layer
     config.num_class = 10              
