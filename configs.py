@@ -28,6 +28,8 @@ def config_resnet18_cifar10():
     
     config.save_model = False                      # save every model checkpoint
     config.wandb_log = True                        # log using wandb
+    config.wandb_proj = 'Grok-Adversarial'
+    config.wandb_pref = 'Resnet18-CIFAR10'
     config.use_ffcv = True
 
     ## resnet params
