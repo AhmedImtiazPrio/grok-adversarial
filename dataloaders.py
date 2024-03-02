@@ -7,6 +7,10 @@ import os
 import time
 import warnings
 
+
+CIFAR_MEAN = [125.307, 122.961, 113.8575]
+CIFAR_STD = [51.5865, 50.847, 51.255]
+
 def cifar10_dataloaders(config):
     """
     Vanilla cifar10 dataloader. No augmentations
@@ -100,8 +104,6 @@ def cifar10_dataloaders_ffcv(config,
             })
             writer.from_indexed_dataset(ds)
     
-    CIFAR_MEAN = [125.307, 122.961, 113.8575]
-    CIFAR_STD = [51.5865, 50.847, 51.255]
     loaders = {}
 
     for name in ['train', 'test']:
@@ -124,8 +126,13 @@ def cifar10_dataloaders_ffcv(config,
             ToDevice(torch.device('cuda:0'), non_blocking=True),
             ToTorchImage(),
             Convert(torch.float16) if precision == 'fp16' else Convert(torch.float32),
-            torchvision.transforms.Normalize(CIFAR_MEAN, CIFAR_STD),
         ])
+        
+        if config.normalize:
+            image_pipeline.extend([
+                torchvision.transforms.Normalize(CIFAR_MEAN, CIFAR_STD)
+            ])
+            
         
         ordering = OrderOption.RANDOM # if name == 'train' else OrderOption.SEQUENTIAL
 
