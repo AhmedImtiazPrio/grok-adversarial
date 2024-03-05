@@ -22,31 +22,6 @@ class PGD(object):
         self.device = device
         self.dmax = dmax
         self.dmin = dmin
-
-#     def __call__(self,images,labels):
-        
-#         images = images.to(self.device)
-#         labels = labels.to(self.device)
-#         loss = torch.nn.CrossEntropyLoss()
-
-#         ori_images = images.data
-#         dmin = ori_images.min() if self.dmin is None else self.dmin
-#         dmax = ori_images.max() if self.dmax is None else self.dmax
-
-#         for i in range(self.steps) :
-
-#             images.requires_grad = True
-#             outputs = self.model(images)
-
-#             self.model.zero_grad()
-#             cost = loss(outputs, labels).to(self.device)
-#             cost.backward()
-
-#             adv_images = images + self.alpha*images.grad.sign()
-#             eta = torch.clamp(adv_images - ori_images, min=-self.eps, max=self.eps)
-#             images = torch.clamp(ori_images + eta, min=dmin, max=dmax).detach_()
-
-#         return images
             
     def __call__(self, images, labels):
 
@@ -55,8 +30,8 @@ class PGD(object):
 
         loss = torch.nn.CrossEntropyLoss()
         adv_images = images.clone().detach()
-        dmin = ori_images.min() if self.dmin is None else self.dmin
-        dmax = ori_images.max() if self.dmax is None else self.dmax
+        dmin = images.min() if self.dmin is None else self.dmin
+        dmax = images.max() if self.dmax is None else self.dmax
 
         if self.random_start:
             # Starting at a uniformly random point

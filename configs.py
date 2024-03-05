@@ -14,7 +14,7 @@ def config_resnet18_cifar10():
     config.num_steps = 500000                       # number of training steps
     config.weight_decay = 0.
     config.label_smoothing = 0.
-    config.log_steps = np.unique(np.logspace(0,5.7,50).astype(int).clip(0,500000))
+    config.log_steps = np.unique(np.logspace(0,5.7,50).astype(int).clip(0,config.num_steps))
     config.seed = 42
     config.normalize = True                        # rescale cifar10 to have mean 0 std 1.25
     
