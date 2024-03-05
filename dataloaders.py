@@ -51,7 +51,6 @@ def cifar10_dataloaders(config):
 
 
 def cifar10_dataloaders_ffcv(config,
-                             aug=False,
                              train_path='./data/cifar10_train.beton',
                              test_path='./data/cifar10_test.beton',
                              precision='fp32',
@@ -112,7 +111,7 @@ def cifar10_dataloaders_ffcv(config,
         image_pipeline: List[Operation] = [SimpleRGBImageDecoder()]
 
         ### add augmentations for train
-        if name == 'train' and aug:
+        if name == 'train' and config.use_aug:
             print('Using training augmentations')
 
             image_pipeline.extend([

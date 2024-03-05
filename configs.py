@@ -1,5 +1,27 @@
 import ml_collections
 import numpy as np
+import argparse
+    
+def boolean_string(s):
+    if s not in {'False', 'True'}:
+        raise ValueError('Not a valid boolean string')
+    return s == 'True'
+
+def config_cmdparser(base_config):
+    """
+    Allows command-line input to config files
+    """
+    
+    parser = argparse.ArgumentParser(description="Modify default config")
+    
+    # Add command line arguments for each parameter in your config file
+    for k,v in base_config.items():
+        if type(v) == bool:
+            parser.add_argument(f'--{k}', type=boolean_string, default=v)
+        else:
+            parser.add_argument(f'--{k}', type=type(v), default=v)
+        
+    return parser.parse_args()
 
 def config_resnet18_cifar10():
     """Get the default hyperparameter configuration for Resnet18-CIFAR10 training"""
@@ -16,6 +38,7 @@ def config_resnet18_cifar10():
     config.label_smoothing = 0.
     config.log_steps = np.unique(np.logspace(0,5.7,50).astype(int).clip(0,config.num_steps))
     config.seed = 42
+    config.use_aug = False
     config.normalize = True                        # rescale cifar10 to have mean 0 std 1.25
     
     if config.normalize:
@@ -54,4 +77,4 @@ def config_resnet18_cifar10():
     config.atk_alpha = 4/255  ## 2/255
     config.atk_itrs = 10
 
-    return config
+    return config_cmdparser(config)
