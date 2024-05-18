@@ -33,7 +33,7 @@ def sample_ortho_random(n,d,seed=None):
 
 # @torch.jit.script
 @torch.no_grad()
-def get_ortho_hull_around_samples(x,r=1,n=10,seed=None):
+def get_ortho_hull_around_samples(x,r=1.,n=10,seed=None):
     """
     x: batchsize x channels x dim1 x dim2
     r: max radius of hull
@@ -75,7 +75,7 @@ def get_ortho_hull_around_samples_w_orig(x,r=1,n=11,seed=None):
 
 @torch.no_grad()
 @torch.jit.script
-def get_hull_around_samples(x : torch.Tensor,r:int = 1,n:int = 10, seed:int = 0):
+def get_hull_around_samples(x : torch.Tensor, r: float = 1., n:int = 10, seed:int = 0):
     """
     x: batchsize x channels x dim1 x dim2
     r: max radius of hull
