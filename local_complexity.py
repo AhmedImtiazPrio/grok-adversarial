@@ -178,3 +178,52 @@ def get_intersections_for_hulls(hulls,
         print(f"LC elapsed time:{time.time()-start_time:.5f}")
     
     return n_inters, p_inters
+
+@torch.no_grad()
+def get_intersections_for_samples(samples,
+                                  model,layer_names,activation_buffer,
+                                  sampler=get_hull_around_samples,
+                                  sampler_params={'n':10,'r':1, 'seed':None},
+                                  batch_size=16
+                                 ):
+    
+    """
+    sampler: sampling function to sample domain around each sample
+    sampler_params: parameters for sampler function
+    batch_size: number of samples to take for each forward pass. 
+    effective gpu batch_size is hull_n*batch_size
+    
+    """
+    
+    if samples.shape[0] % batch_size != 0:
+        warnings.warn('number of samples not divisible by `batch_size`, last batch will be dropped')
+    
+    dataloader = torch.utils.data.DataLoader(samples,
+                                             batch_size=batch_size,
+                                             pin_memory=True,
+                                             shuffle=False,
+                                             drop_last=True
+                                            )
+    
+    n_inters = torch.zeros(samples.shape[0],len(layer_names),device='cpu')
+    p_inters = torch.zeros_like(n_inters)
+    
+    start = 0
+    for batch in dataloader:
+        
+        end  = start+batch_size
+        
+        with torch.no_grad():
+        
+            hulls = sampler(batch.cuda(),**sampler_params)
+            hulls = hulls.reshape(batch_size*sampler_params['n'],
+                                  *hulls.shape[2:])
+            out = model.forward(hulls)
+            n_inter,p_inter = get_layer_intersections_batched(layer_names, activation_buffer,
+                                            batch_size=batch_size)
+        n_inters[start:end] = n_inter
+        p_inters[start:end] = p_inter
+        
+        start = end
+        
+    return n_inters, p_inters
