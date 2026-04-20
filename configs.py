@@ -78,3 +78,49 @@ def config_resnet18_cifar10():
     config.atk_itrs = 10
 
     return config_cmdparser(config)
+
+class config_base_mnist_mlp(object):
+    
+    def __init__(self):
+        
+        self.train_points = 1000
+        self.optimization_steps = 1000000
+        self.label_noise = 0
+        
+        self.dataset = 'mnist'
+        self._in_dims = (28,28) ## input dimensionality 
+        self._n_classes = 10
+    
+        self.batch_size = 200
+        self.loss_function = 'MSE'   # 'MSE' or 'CrossEntropy'
+
+        self.optimizer = 'AdamW'     # 'AdamW' or 'Adam' or 'SGD'
+        self.weight_decay = 0.01
+        self.lr = 1e-3
+        self.initialization_scale = 1.0
+        self.download_directory = "."
+
+        self.activation = 'GeLU'     # 'ReLU' or 'Tanh' or 'Sigmoid' or 'GELU'
+        
+        self.log_freq = math.ceil(self.optimization_steps / 150)
+
+        ## number of data points to compute local non-linearity
+        
+        self.approx_n = 10000
+        self.hull_n = 50
+        
+        self.seed = 0
+        self.approx_batch_size = 10000
+        self.hull_r = [0.05,0.1,0.5,1,5]
+        
+        self.load_model = None
+        
+        self.model = 'mlp'
+        self.width,self.depth = [200,200,200,200,200],[2,3,4,5,6]  ## need to be equal length
+
+        self.log_name = f'{self.dataset}-{self.model}'
+    
+        self._logger_steps = np.unique(np.linspace(0,1e5,60*30).astype(int))
+        
+        if type(self.width) == list or type(self.depth) == list:
+            assert len(self.width) == len(self.depth), 'Both need to be lists and equal length'
