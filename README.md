@@ -36,6 +36,21 @@ conda activate grokspline
 
 ### Training
 
+
+#### MNIST (MLP)
+To train the MLP model on MNIST with default settings, you must provide a log comment:
+
+```bash
+python train_mlp_mnist.py "my_experiment_comment"
+```
+
+You can override configurations defined in `configs.py` by passing the attribute name and value as additional arguments:
+
+```bash
+python train_mlp_mnist.py "my_experiment_comment" "lr" 0.001
+```
+
+#### CIFAR10 (ResNet18)
 To train the ResNet18 model on CIFAR10 with default settings:
 
 ```bash
