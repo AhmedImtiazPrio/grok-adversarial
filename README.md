@@ -1,4 +1,4 @@
-## Deep Networks Always Grok and Here is Why, ArXiv 2024
+## Deep Networks Always Grok and Here is Why, ICML 2024
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://bit.ly/grok-adv-demo)
 [![Open In Colab](https://img.shields.io/badge/Weights_&_Biases-FFCC33?logo=WeightsAndBiases&logoColor=black)](https://bit.ly/grok-adv-trak)
 
@@ -14,6 +14,47 @@ Fig: CNN grokking CIFAR10 adversarial examples (Left), ResNet18 grokking Imagene
 <br>
 
 
+### Local Complexity Computation
 
-Coming Soon!
-Check out our visualization tool in the meantime: [bit.ly/splinecam](https://bit.ly/splinecam)
+This codebase computes the "local complexity" of a neural network inside a cross-polytopal region of the input space. At a high level:
+1.  **Neighborhood Sampling**: For any point in the input space, we sample a neighborhood (hull) of points by adding and subtracting random orthogonal vectors.
+2.  **Intersection Counting**: We pass these points through the model and check if the activation pattern (sign of activations) changes for any neuron across the neighborhood. A change indicates that the neuron's decision boundary intersects the neighborhood.
+3.  **Complexity Metric**: The number (or percentage) of intersecting neurons is counted as a measure of local complexity.
+
+
+
+## Getting Started
+
+### Environment Setup
+
+You can recreate the conda environment used in this project with the provided `grokspline.yml` file:
+
+```bash
+conda env create -f grokspline.yml
+conda activate grokspline
+```
+
+### Training
+
+To train the ResNet18 model on CIFAR10 with default settings:
+
+```bash
+python train_resnet18_cifar10.py
+```
+
+You can override configurations defined in `configs.py` via command line arguments. For example:
+
+```bash
+python train_resnet18_cifar10.py --lr 0.001 --use_ffcv False
+```
+
+### Citation
+
+```bibtex
+@inproceedings{humayun2024grok,
+author = {Humayun, Ahmed Imtiaz and Balestriero, Randall and Baraniuk, Richard},
+title = {Deep networks always grok and here is why},
+year = {2024},
+booktitle = {International Conference on Machine Learning},
+}
+```
